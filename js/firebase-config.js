@@ -6,6 +6,7 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from
 const firebaseConfig = {
   apiKey: "AIzaSyAfq79DrInq_jxNoxRZCQTijStmT5mhhHU",
   authDomain: "nmubooking.firebaseapp.com",
+  databaseURL: "https://nmubooking-default-rtdb.asia-southeast1.firebasedatabase.app", // 🟢 เพิ่มบรรทัดนี้ลงไป
   projectId: "nmubooking",
   storageBucket: "nmubooking.firebasestorage.app",
   messagingSenderId: "1062389697596",
@@ -16,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-// Google Apps Script URL (จากขั้นตอนที่แล้ว)
+// Google Apps Script URL
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXdJR6r3kB_TkJjBa0-O6lVy4vjxe3wSnudwSRbIEIGX9g7SCKgOWnsYy15heEjYhw/exec";
 
 export { db, auth, ref, set, get, update, push, child, onValue, remove, runTransaction, signInWithEmailAndPassword, onAuthStateChanged, signOut, GOOGLE_SCRIPT_URL };
