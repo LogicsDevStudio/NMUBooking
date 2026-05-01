@@ -4,20 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard แสดงที่นั่งว่าง</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .station-name { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
-        .round-info { margin-bottom: 5px; color: #555; }
-        .seats { font-size: 1.5em; font-weight: bold; color: #2ecc71; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-    <h1>📊 สถานะที่นั่งว่างกิจกรรม (Real-time)</h1>
-    <div class="dashboard" id="dashboard">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">Activity Dashboard</a>
+            <div class="d-flex">
+                <a href="login.html" class="btn btn-outline-light">เข้าสู่ระบบเจ้าหน้าที่</a>
+            </div>
         </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="mb-4">📊 สถานะที่นั่งว่างกิจกรรม (Real-time)</h2>
+        <div class="row" id="dashboard">
+            </div>
+    </div>
 
     <script type="module">
         import { db, ref, onValue } from './js/firebase-config.js';
@@ -33,19 +37,25 @@
             
             if (data) {
                 for (const [roundId, roundData] of Object.entries(data)) {
-                    // คำนวณที่นั่งว่าง (ในระบบจริงต้องไปนับจาก node 'seats' ที่ status = 'available')
-                    // ตัวอย่างนี้สมมติให้ใช้ totalSeats ชั่วคราวเพื่อให้เห็นภาพ
+                    // สร้าง Card แสดงผลโดยใช้ Bootstrap
                     const card = `
-                        <div class="card">
-                            <div class="station-name">ฐาน: ${roundData.stationId}</div>
-                            <div class="round-info">เวลา: ${roundData.startTime} - ${roundData.endTime}</div>
-                            <div class="seats">ที่นั่งทั้งหมด: ${roundData.totalSeats}</div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary fw-bold">ฐาน: ${roundData.stationId}</h5>
+                                    <h6 class="card-subtitle mb-3 text-muted">เวลา: ${roundData.startTime}</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fs-5">ที่นั่งทั้งหมด:</span>
+                                        <span class="fs-3 fw-bold text-success">${roundData.totalSeats}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     `;
                     dashboardElement.innerHTML += card;
                 }
             } else {
-                dashboardElement.innerHTML = '<p>ยังไม่มีข้อมูลรอบกิจกรรม</p>';
+                dashboardElement.innerHTML = '<div class="col-12"><p class="text-muted">ยังไม่มีข้อมูลรอบกิจกรรม</p></div>';
             }
         });
     </script>
