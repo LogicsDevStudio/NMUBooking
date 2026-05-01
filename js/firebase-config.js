@@ -1,7 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getDatabase, ref, set, get, update, push, child, onValue, remove, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAfq79DrInq_jxNoxRZCQTijStmT5mhhHU",
   authDomain: "nmubooking.firebaseapp.com",
@@ -15,4 +16,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-export { db, auth, ref, onValue };
+// Google Apps Script URL (จากขั้นตอนที่แล้ว)
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXdJR6r3kB_TkJjBa0-O6lVy4vjxe3wSnudwSRbIEIGX9g7SCKgOWnsYy15heEjYhw/exec";
+
+export { db, auth, ref, set, get, update, push, child, onValue, remove, runTransaction, signInWithEmailAndPassword, onAuthStateChanged, signOut, GOOGLE_SCRIPT_URL };
