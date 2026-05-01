@@ -1,1 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard แสดงที่นั่งว่าง</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .station-name { font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
+        .round-info { margin-bottom: 5px; color: #555; }
+        .seats { font-size: 1.5em; font-weight: bold; color: #2ecc71; }
+    </style>
+</head>
+<body>
 
+    <h1>📊 สถานะที่นั่งว่างกิจกรรม (Real-time)</h1>
+    <div class="dashboard" id="dashboard">
+        </div>
+
+    <script type="module">
+        import { db, ref, onValue } from './js/firebase-config.js';
+
+        const dashboardElement = document.getElementById('dashboard');
+
+        // ดึงข้อมูลรอบและที่นั่งแบบ Realtime
+        const roundsRef = ref(db, 'rounds');
+        
+        onValue(roundsRef, (snapshot) => {
+            dashboardElement.innerHTML = ''; // เคลียร์ของเก่าก่อน
+            const data = snapshot.val();
+            
+            if (data) {
+                for (const [roundId, roundData] of Object.entries(data)) {
+                    // คำนวณที่นั่งว่าง (ในระบบจริงต้องไปนับจาก node 'seats' ที่ status = 'available')
+                    // ตัวอย่างนี้สมมติให้ใช้ totalSeats ชั่วคราวเพื่อให้เห็นภาพ
+                    const card = `
+                        <div class="card">
+                            <div class="station-name">ฐาน: ${roundData.stationId}</div>
+                            <div class="round-info">เวลา: ${roundData.startTime} - ${roundData.endTime}</div>
+                            <div class="seats">ที่นั่งทั้งหมด: ${roundData.totalSeats}</div>
+                        </div>
+                    `;
+                    dashboardElement.innerHTML += card;
+                }
+            } else {
+                dashboardElement.innerHTML = '<p>ยังไม่มีข้อมูลรอบกิจกรรม</p>';
+            }
+        });
+    </script>
+</body>
+</html>
