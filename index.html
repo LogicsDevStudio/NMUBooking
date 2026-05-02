@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจองเข้าร่วมกิจกรรม (Realtime SPA)</title>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+    <nav>
+        <button onclick="navigate('page-dashboard')">หน้าแรก (ที่นั่งว่าง)</button>
+        <button onclick="navigate('page-login')" id="nav-login">เข้าสู่ระบบ</button>
+        
+        <button onclick="navigate('page-booking')" class="auth-only hidden">จองที่นั่ง</button>
+        <button onclick="navigate('page-checkin')" class="auth-only hidden">สแกน Check-in</button>
+        
+        <button onclick="navigate('page-manage-staff')" class="admin-only hidden">จัดการเจ้าหน้าที่</button>
+        <button onclick="navigate('page-manage-bookings')" class="admin-only hidden">รายการจอง</button>
+        <button onclick="navigate('page-manage-stations')" class="admin-only hidden">จัดการฐาน/รอบ</button>
+        
+        <button onclick="logout()" id="nav-logout" class="hidden" style="background: #e74c3c;">ออกจากระบบ</button>
+    </nav>
+
+    <section id="page-dashboard" class="page active">
+        <h2>สถานะที่นั่งว่างแบบ Realtime</h2>
+        <div id="dashboard-content" class="grid-cards"></div>
+    </section>
+
+    <section id="page-login" class="page hidden">
+        <h2>เข้าสู่ระบบ (Staff / Admin)</h2>
+        <input type="email" id="login-email" placeholder="อีเมล">
+        <input type="password" id="login-password" placeholder="รหัสผ่าน">
+        <button onclick="login()">เข้าสู่ระบบ</button>
+    </section>
+
+    <section id="page-booking" class="page hidden">
+        <h2>จองที่นั่งกิจกรรม</h2>
+        <select id="select-station" onchange="loadSessions(this.value)">
+            <option value="">-- เลือกฐานกิจกรรม --</option>
+        </select>
+        <select id="select-session" onchange="renderSeatLayout(this.value)">
+            <option value="">-- เลือกรอบเวลา --</option>
+        </select>
+        
+        <div id="participant-section" class="hidden" style="margin-top: 20px;">
+            <input type="text" id="id-card" placeholder="เลขประจำตัวประชาชน 13 หลัก" maxlength="13">
+            <button onclick="fetchGoogleSheet()">ดึงข้อมูลผู้เข้าร่วม</button>
+            <p id="participant-info"></p>
+            
+            <div id="seat-layout" class="seat-grid hidden"></div>
+            <p>ที่นั่งที่เลือก: <strong id="selected-seat">-</strong></p>
+            <button onclick="confirmBooking()" id="btn-confirm-booking" class="hidden">ยืนยันการจอง</button>
+        </div>
+
+        <div id="qrcode-container" style="margin-top: 20px;"></div>
+    </section>
+
+    <section id="page-checkin" class="page hidden">
+        <h2>สแกน QR Code เพื่อ Check-in</h2>
+        <div id="qr-reader" style="width: 300px; margin: 0 auto;"></div>
+        <button onclick="startScanner()">เปิดกล้องสแกน</button>
+        <button onclick="stopScanner()" style="background: #e74c3c;">ปิดกล้อง</button>
+        <p id="scan-result"></p>
+    </section>
+
+    <section id="page-manage-staff" class="page admin-only hidden">
+        <h2>จัดการเจ้าหน้าที่</h2>
+        <p><i>* กำหนด UID, Role และฐานที่ได้รับอนุญาต</i></p>
+        <input type="text" id="staff-uid" placeholder="User UID">
+        <select id="staff-role"><option value="staff">Staff</option><option value="admin">Admin</option></select>
+        <input type="text" id="staff-stations" placeholder="รหัสฐาน (คั่นด้วยลูกน้ำ) เช่น st1,st2 หรือ all">
+        <button onclick="saveStaff()">บันทึกเจ้าหน้าที่</button>
+    </section>
+
+    <section id="page-manage-bookings" class="page admin-only hidden">
+        <h2>จัดการรายการจอง</h2>
+        <div id="admin-booking-list"></div>
+    </section>
+
+    <section id="page-manage-stations" class="page admin-only hidden">
+        <h2>จัดการฐานกิจกรรมและรอบเวลา</h2>
+        <input type="text" id="st-id" placeholder="รหัสฐาน (เช่น st1)">
+        <input type="text" id="st-name" placeholder="ชื่อฐาน">
+        <button onclick="saveStation()">เพิ่ม/แก้ไขฐาน</button>
+        <hr>
+        <input type="text" id="sess-id" placeholder="รหัสรอบ (เช่น sess1)">
+        <input type="text" id="sess-st-id" placeholder="รหัสฐานที่สังกัด (เช่น st1)">
+        <input type="text" id="sess-time" placeholder="เวลา (เช่น 10:00 - 11:00)">
+        <input type="number" id="sess-rows" placeholder="จำนวนแถว (Rows)">
+        <input type="number" id="sess-cols" placeholder="จำนวนที่นั่งต่อแถว (Cols)">
+        <button onclick="saveSession()">เพิ่ม/แก้ไขรอบ</button>
+    </section>
+
+    <script src="js/app.js"></script>
+    <script src="js/staff.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
