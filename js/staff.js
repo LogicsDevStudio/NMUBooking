@@ -35,7 +35,7 @@ function loadSessions(stationId) {
 // ดึงข้อมูล Google Sheets
 async function fetchGoogleSheet() {
     const idCard = document.getElementById('id-card').value;
-    const gasUrl = `YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL?id=${idCard}`;
+    const gasUrl = `https://script.google.com/macros/s/AKfycbxXdJR6r3kB_TkJjBa0-O6lVy4vjxe3wSnudwSRbIEIGX9g7SCKgOWnsYy15heEjYhw/exec?id=${idCard}`;
     
     document.getElementById('participant-info').innerText = "กำลังค้นหา...";
     const res = await fetch(gasUrl);
