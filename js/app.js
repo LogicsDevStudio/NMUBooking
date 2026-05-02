@@ -1,9 +1,13 @@
 // ตั้งค่า Firebase
+// Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-    projectId: "YOUR_PROJECT"
+  apiKey: "AIzaSyBmz2rvszMy9QtwCQsYRKF9ueBb_mBydqg",
+  authDomain: "nmuoph2026bk.firebaseapp.com",
+  databaseURL: "https://nmuoph2026bk-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "nmuoph2026bk",
+  storageBucket: "nmuoph2026bk.firebasestorage.app",
+  messagingSenderId: "586288533801",
+  appId: "1:586288533801:web:72d0107a598839c919e738"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
