@@ -17,8 +17,16 @@ let currentUserData = null; // เก็บข้อมูล Role/Stations
 
 // --- 1. SPA Routing ---
 function navigate(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
+    // ซ่อนทุกหน้าโดยเอา active ออก และใส่ hidden กลับเข้าไป
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.classList.add('hidden'); 
+    });
+    
+    // แสดงหน้าที่เลือกโดยเอา hidden ออก และใส่ active
+    const targetPage = document.getElementById(pageId);
+    targetPage.classList.remove('hidden');
+    targetPage.classList.add('active');
 }
 
 // --- 2. Authentication & Role Management ---
